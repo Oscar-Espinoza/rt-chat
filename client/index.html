@@ -8,6 +8,24 @@
     import { io } from "https://cdn.socket.io/4.3.2/socket.io.esm.min.js";
 
     const socket = io();
+
+    const form = document.getElementById('form');
+    const input = document.getElementById('input');
+    const messages = document.getElementById('messages')
+
+    form.addEventListener('submit', (e) => {
+      e.preventDefault();
+
+      if (input.value) {
+        socket.emit('chat message', input.value);
+        input.value = '';
+      }
+    });
+
+    socket.on('chat message', (msg) => {
+      const item = `<li>${msg}</li>`;
+      messages.insertAdjacentHTML('beforeend', item);
+    })
   </script>
   <style>
     *, *::before, *::after {
@@ -24,8 +42,18 @@
       display: grid;
       place-content: center;
       height: 100vh;
-      padding: 36px;
+      padding: 36px 36px 100px 36px;
       grid-template-rows: 1fr;
+    }
+
+    #messages {
+      list-style-type: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    #messages > li:nth-child(odd) {
+      background: #000;
     }
   
     #chat {
@@ -36,11 +64,47 @@
       height: 100%;
       position: relative;
     }
+
+    #form {
+      position: absolute;
+      bottom: 0;
+      right: 0;
+      left: 0;
+      display: flex;
+      height: 48px;
+      padding: 4px;
+    }
+
+    #input {
+      border-radius: 9999px;
+      border: 1px solid #eee;
+      flex: 1;
+      margin: 4px;
+      padding: 0 8px;
+    }
+
+    #input:focus {
+      outline: 0;
+    }
+
+    #form > button {
+      background: #09f;
+      color: #fff;
+      border: 0;
+      margin: 4px;
+      border-radius: 4px;
+    }
+
+    #form>button:hover {
+      background: #0cf;
+      cursor: pointer;
+    }
   </style>
 </head>
 
 <body>
   <section id="chat">
+    <ul id="messages"></ul>
     <form id="form">
       <input type="text" name="message" id="input" placeholder="Type a message" autocomplete="off" />
       <button type="submit">Send</button>
