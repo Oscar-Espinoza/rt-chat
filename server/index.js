@@ -1,5 +1,7 @@
 import express from 'express';
 import logger from 'morgan';
+import dotenv from 'dotenv';
+import { createClient } from '@libsql/client';
 
 import { Server } from 'socket.io';
 import { createServer } from 'node:http'
@@ -8,7 +10,14 @@ const port = process.env.PORT ?? 3000;
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server);
+const io = new Server(server, {
+  connectionStateRecovery: {}
+});
+
+const db = createClient({
+  url: "libsql://enabling-faith-oscar-espinoza.turso.io",
+  authToken: process.env.DB_TOKEN,
+})
 
 io.on('connection', (socket) => {
   console.log('a user has connected!')
